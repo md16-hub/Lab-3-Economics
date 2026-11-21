@@ -28,17 +28,18 @@ K = 55
 n = 10000
 
 #p_star = (1+r-d)/(u-d)
-#simulate one reandom moevment(aka one time oeriod) = 1 day
-#run 30 days
-#run 30 day simulation 10000 times to tkae out randomness- avg predicted stock price gives
+#Simulate 1 time step(1day)
+#Run 30 day simulation to avg out the randomness (10,000 times)
 
 def single(p, u, d):
+    #make a single random proce movement thats one time step
     if random.random()<= p:
         return u
     else:
         return d
 
 def BLM(S0, T, p, u, d):
+    #single price path over t time periods, using BLM
     BLMpath = [0 for k in range(T + 1)]
     BLMpath[0] = S0
     Ysamples = [single(p, u, d) for k in range(T)]
@@ -49,6 +50,7 @@ def BLM(S0, T, p, u, d):
     return BLMpath
 
 def find_CT(T, R, u, d, S0, K):
+    #calculate the payoff of a european put at maturity for single path
     p_star = (1 + r - d)/ (u-d)
     BLMpath = BLM(S0, T, p_star, u, d)
     ST = BLMpath[-1]
@@ -56,12 +58,13 @@ def find_CT(T, R, u, d, S0, K):
     return CT
 
 def monte_carlo(T, r, u, d, S0, K, n):
+    #run simulation n times and average the payoffs
     total = 0
     for x in range(n):
         total += find_CT(T, r, u, d, S0, K)
-    avg_CT = total /n
+    avg_CT = total /n  #discount back to present value using risk free rate
     C0 = avg_CT/(1 + r) ** T
-    return C0
+    return C0 
     
     return
 print(monte_carlo(T, r, u, d, S0, K, n))
